@@ -10,44 +10,26 @@ from sklearn.linear_model import LogisticRegression
 import seaborn as sns
 
 
-class Data:
-    features = None
-    classes = None
-    edgelist = None
+class Home:
+    data = None
     x_test = None
     x_train = None
     y_test = None
     y_train = None
+    model = None
 
     @st.cache
-    def load_data(self):
-        edgelist = pd.read_csv("/home/mehdi/pfe/data/edgelist.csv")
-        classes = pd.read_csv("/home/mehdi/pfe/data/classes.csv")
-        features = pd.read_csv("/home/mehdi/pfe/data/features.csv")
+    def loadData(self):
+        data = pd.read_csv("/home/mehdi/pfe/data/data.csv")
+        return data
 
-        return edgelist, classes, features
-
-    def initvars(self, edgelist, classes, features):
-        self.edgelist = edgelist
-        self.features = features
-        self.classes = classes
-
-    def clean(self):
-        self.features.columns = ["txId", "time step"] + [i for i in range(165)]
-        # fusionner les table 'classes' et 'futures'
-        self.features = pd.merge(
-            self.features, self.classes, left_on="txId", right_on="txId", how="left"
-        )
-        # remplacer 'unknown' par '0'
-        self.features["class"] = self.features["class"].apply(
-            lambda x: "0" if x == "unknown" else x
-        )
+    def initData(self, data):
+        data.columns = ["txId", "time step"] + [i for i in range(165)] + ["class"]
+        self.data = data
 
     def split(self):
-        data = self.features[self.features["class"] != "0"]
-        X = data[[i for i in range(165)]]
-        Y = data["class"]
-        # Y = Y.apply(lambda x: 0 if x == '2' else 1 )
+        X = self.data[[i for i in range(165)]]
+        Y = self.data["class"]
         x_train, x_test, y_train, y_test = train_test_split(
             X, Y, test_size=0.3, random_state=15, shuffle=False
         )
@@ -71,26 +53,22 @@ class Data:
         st.write(cr)
 
 
-data = Data()
+home = Home()
 st.write("loading data...")
-edgelist, classes, features = data.load_data()
-data.initvars(edgelist, classes, features)
+data = home.loadData()
+home.initData(data)
+st.write(data.head())
 st.write("data loaded!")
-
-st.write("cleaning data...")
-data.clean()
-st.write("cleaned")
-st.write(data.features.head())
 
 
 st.write("splitting data...")
-data.split()
+home.split()
 st.write("data splitted")
 
 st.write("training data...")
-data.train(False)
+home.train(True)
 st.write("data trained")
 
 st.write("evaluating data...")
-data.evaluate(data.model)
+home.evaluate(home.model)
 st.write("data evaluated")
