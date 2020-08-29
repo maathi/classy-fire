@@ -9,3 +9,11 @@ class Human:
 
 me = Human()
 me.getname()
+
+
+def shoot():
+    return 1, 2, 3
+
+
+a, b, c = shoot()
+print(a, b, c)
