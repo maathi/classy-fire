@@ -16,8 +16,8 @@ class Df:
     y_train = None
 
     @st.cache
-    def loadData(self):
-        data = pd.read_csv("/home/mehdi/pfe/data/data.csv")
+    def loadData(self, filename):
+        data = pd.read_csv("/home/mehdi/pfe/app/data/" + filename)
         return data
 
     def initData(self, data):
@@ -62,14 +62,15 @@ class Classifier:
         st.balloons()
 
 
-# def file_selector(folder_path="."):
-#     filenames = os.listdir(folder_path)
-#     selected_filename = st.selectbox("Select a file", filenames)
-#     return os.path.join(folder_path, selected_filename)
+def file_selector(folder_path="data"):
+    filenames = os.listdir(folder_path)
+    selected_filename = st.selectbox("Select a file", filenames)
+    # return os.path.join(folder_path, selected_filename)
+    return selected_filename
 
 
 # uploader = st.empty()
-# filename = file_selector()
+
 # uploader.file_uploader("upload here")
 # uploader.text("i am a text")
 # uploader.table(pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"]))
@@ -77,29 +78,32 @@ class Classifier:
 # uploader.text_input("input goes here", value="initial text")
 # st.balloons()
 # uploader.balloons()
-# st.write('You selected `%s`' % filename)
 
 
 def run():
-    df = Df()
-    st.write("loading data...")
-    data = df.loadData()
-    df.initData(data)
-    st.write(data.head())
-    st.write("data loaded!")
+    filename = file_selector()
+    st.write("You selected `%s`" % filename)
 
-    st.write("splitting data...")
-    df.split()
-    st.write("data splitted")
+    if st.button("upload"):
+        df = Df()
+        st.write("loading data...")
+        data = df.loadData(filename)
+        df.initData(data)
+        st.write(data.head())
+        st.write("data loaded!")
 
-    st.write("training data...")
-    cl = Classifier(df, 2)
-    cl.train()
-    st.write("data trained")
+        st.write("splitting data...")
+        df.split()
+        st.write("data splitted")
 
-    st.write("evaluating data...")
-    cl.evaluate()
-    st.write("data evaluated")
+        st.write("training data...")
+        cl = Classifier(df, 2)
+        cl.train()
+        st.write("data trained")
+
+        st.write("evaluating data...")
+        cl.evaluate()
+        st.write("data evaluated")
 
 
 run()
