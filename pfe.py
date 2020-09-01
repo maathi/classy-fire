@@ -12,47 +12,26 @@ from streamlit import caching
 
 
 @st.cache(suppress_st_warning=True, allow_output_mutation=True)
-class Df:
-    data = None
+class Data:
     filename = None
+    df = None
 
-    x_test = None
-    x_train = None
-    y_test = None
-    y_train = None
-
-    classes = None
-
-    # @st.cache(show_spinner=False)
-    def loadData(self, filename):
+    def init(self, filename):
         self.filename = filename
-        data = pd.read_csv("/home/mehdi/pfe/app/data/" + filename)
-        return data
+        self.df = pd.read_csv("/home/mehdi/pfe/app/data/" + filename)
 
-    def initData(self, data):
-        # data.columns = ["txId", "time step"] + [i for i in range(165)] + ["class"]
-        self.data = data
+    #     data.columns = ["txId", "time step"] + [i for i in range(165)] + ["class"]
 
-    def showInfos(self):
-        st.subheader("informations sur `%s`" % self.filename)
-        st.write("number of rows :  `%d`" % self.data.shape[0])
-        st.write("number of columns :  `%d`" % self.data.shape[1])
-        st.write(st.table(self.data.groupby(["class"]).size()))
-        # for i, v in self.data.groupby(["class"]).size().items():
-        #     st.write(i, v)
-        st.write(self.data.head())
-        st.spinner()
-
-    def split(self):
-        X = self.data[[i for i in range(165)]]
-        Y = self.data["class"]
-        x_train, x_test, y_train, y_test = train_test_split(
-            X, Y, test_size=0.3, random_state=15, shuffle=False
-        )
-        self.x_test = x_test
-        self.x_train = x_train
-        self.y_test = y_test
-        self.y_train = y_train
+    # def split(self):
+    #     X = self.data[[i for i in range(165)]]
+    #     Y = self.data["class"]
+    #     x_train, x_test, y_train, y_test = train_test_split(
+    #         X, Y, test_size=0.3, random_state=15, shuffle=False
+    #     )
+    #     self.x_test = x_test
+    #     self.x_train = x_train
+    #     self.y_test = y_test
+    #     self.y_train = y_train
 
 
 class Classifier:
@@ -81,64 +60,56 @@ class Classifier:
         st.balloons()
 
 
-# @st.cache(suppress_st_warning=True)
 def file_selector(folder_path="data"):
     filenames = os.listdir(folder_path)
     selected_filename = st.selectbox("Select a file", filenames)
-    # return os.path.join(folder_path, selected_filename)
     return selected_filename
 
 
-# uploader = st.empty()
+def upload():
+    filename = file_selector()
+    st.write("You selected `%s`" % filename)
+    if st.button("upload"):
+        with st.spinner("Wait for it..."):
+            data = Data()
+            data.init(filename)
+        st.success("Done!")
 
-# uploader.file_uploader("upload here")
-# uploader.text("i am a text").balloons()
-# uploader.balloons()
-# uploader.table(pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"]))
-# uploader.text_area("some label")
-# uploader.text_input("input goes here", value="initial text")
-# st.balloons()
-# uploader.balloons()
+
+def infos():
+    data = Data()
+    st.subheader("informations sur `%s`" % data.filename)
+    st.write("number of rows :  `%d`" % data.df.shape[0])
+    st.write("number of columns :  `%d`" % data.df.shape[1])
+    st.write(st.table(data.df.groupby(["class"]).size()))
+    # for i, v in df.data.groupby(["class"]).size().items():
+    #     st.write(i, v)
+    st.write(data.df.head())
+
+
+def visualize():
+    data = Data()
+    st.bar_chart(data.df.groupby(["class"]).size())
+
+
+def classify():
+    st.header("classifiying the data...")
 
 
 def run():
-    df = None
+
     res = st.sidebar.selectbox(
         "choose wisely", ["📥 upload", "🔍 explore", "📊 visualize", "🧮 classify"]
     )
 
-    st.sidebar.button("hooo")
     if res == "📥 upload":
-        # caching.clear_cache()
-        filename = file_selector()
-        st.write("You selected `%s`" % filename)
-        if st.button("upload"):
-            with st.spinner("Wait for it..."):
-                df = Df()
-                data = df.loadData(filename)
-                df.initData(data)
-            st.success("Done!")
+        upload()
     if res == "🔍 explore":
-        # filename = file_selector()
-        df = Df()
-        # data = df.loadData(filename)
-        # df.initData(data)
-        df.showInfos()
-    if res == "eat":
-        st.write("you eat")
-
-    # st.write("splitting data...")
-    # df.split()
-    # st.write("data splitted")
-
-    # st.write("training data...")
-    # cl = Classifier(df, 2)
-    # cl.train()
-    # st.write("data trained")
-
-    # st.write("evaluating data...")
-    # cl.evaluate()
-    # st.write("data evaluated")
+        infos()
+    if res == "📊 visualize":
+        visualize()
+    if res == "🧮 classify":
+        classify()
 
 
 run()
