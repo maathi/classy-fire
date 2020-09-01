@@ -15,47 +15,50 @@ from streamlit import caching
 class Data:
     filename = None
     df = None
+    loaded = False
 
     def init(self, filename):
         self.filename = filename
         self.df = pd.read_csv("/home/mehdi/pfe/app/data/" + filename)
+        self.loaded = True
 
     #     data.columns = ["txId", "time step"] + [i for i in range(165)] + ["class"]
-
-    # def split(self):
-    #     X = self.data[[i for i in range(165)]]
-    #     Y = self.data["class"]
-    #     x_train, x_test, y_train, y_test = train_test_split(
-    #         X, Y, test_size=0.3, random_state=15, shuffle=False
-    #     )
-    #     self.x_test = x_test
-    #     self.x_train = x_train
-    #     self.y_test = y_test
-    #     self.y_train = y_train
 
 
 class Classifier:
     df = None
-    clfType = None
+    algo = None
     model = None
 
-    def __init__(self, df, clfType):
-        self.df = df
-        self.clfType = clfType
+    def __init__(self, data, algo):
+        self.df = data.df
+        self.algo = algo
+
+    def split(self):
+        X = self.df[self.df.columns[:-1]]
+        Y = self.df[self.df.columns[-1:]]
+
+        x_train, x_test, y_train, y_test = train_test_split(
+            X, Y, test_size=0.3, random_state=15, shuffle=False
+        )
+        self.x_test = x_test
+        self.x_train = x_train
+        self.y_test = y_test
+        self.y_train = y_train
 
     def train(self):
-        if self.clfType == 1:
-            model = LogisticRegression().fit(self.df.x_train, self.df.y_train)
-        elif self.clfType == 2:
+        if self.algo == "Logistic Regression":
+            model = LogisticRegression().fit(self.x_train, self.y_train)
+        elif self.algo == "Random Forest":
             model = RandomForestClassifier(
                 n_estimators=50, max_depth=100, random_state=15
-            ).fit(self.df.x_train, self.df.y_train)
+            ).fit(self.x_train, self.y_train)
 
         self.model = model
 
     def evaluate(self):
-        preds = self.model.predict(self.df.x_test)
-        cr = classification_report(self.df.y_test, preds)
+        preds = self.model.predict(self.x_test)
+        cr = classification_report(self.y_test, preds)
         st.write(cr)
         st.balloons()
 
@@ -66,7 +69,15 @@ def file_selector(folder_path="data"):
     return selected_filename
 
 
+##################
+#########################
+#########
+#######################################3
+
+
 def upload():
+    st.header("📤 upload")
+
     filename = file_selector()
     st.write("You selected `%s`" % filename)
     if st.button("upload"):
@@ -77,38 +88,77 @@ def upload():
 
 
 def infos():
+    st.header("🔍 informations")
     data = Data()
-    st.subheader("informations sur `%s`" % data.filename)
-    st.write("number of rows :  `%d`" % data.df.shape[0])
-    st.write("number of columns :  `%d`" % data.df.shape[1])
-    st.write(st.table(data.df.groupby(["class"]).size()))
+    if not data.loaded:
+        st.write("upload first")
+        return
+
+    st.header("informations sur `%s` :" % data.filename)
+
+    st.write("Nombre de lignes :  `%d`" % data.df.shape[0])
+    st.write("Nombre de colonnes :  `%d`" % data.df.shape[1])
+    st.write(
+        "Nombre de classes :  `%d`"
+        % data.df.groupby([data.df.columns[-1]]).size().count()
+    )
+    st.write("les classes existantes et leurs fréquences correspondantes :")
+    st.write(st.table(data.df.groupby([data.df.columns[-1]]).size()))
+
     # for i, v in df.data.groupby(["class"]).size().items():
     #     st.write(i, v)
-    st.write(data.df.head())
+    st.subheader("affichage de la table `%s` :" % data.filename[:-4])
+    n_rows = st.slider("sélectionnez le nombre de lignes à afficher :", 5, 20, 10)
+    st.write(data.df.head(n_rows))
 
 
 def visualize():
+    st.header("📊 visualiser")
     data = Data()
-    st.bar_chart(data.df.groupby(["class"]).size())
+    if not data.loaded:
+        st.write("upload first")
+        return
+
+    chart = st.selectbox("chart", ["bar", "line"])
+
+    if chart == "bar":
+        st.bar_chart(data.df.groupby([data.df.columns[-1]]).size())
+    elif chart == "line":
+        st.line_chart(data.df.groupby([data.df.columns[-1]]).size())
 
 
 def classify():
-    st.header("classifiying the data...")
+    st.header("🧮 classification des données :")
+    data = Data()
+    if not data.loaded:
+        st.write("upload first")
+        return
 
+    algo = st.selectbox(
+        "sélectionnez l'algorithme de classification :",
+        ["__","Random Forest", "Logistic Regression"],
+    )
+    
+    if algo != "__":
+        with st.spinner("classification en cours..."):
+            clf = Classifier(data, algo)
+            clf.split()
+            clf.train()
+            clf.evaluate()
 
 def run():
 
     res = st.sidebar.selectbox(
-        "choose wisely", ["📥 upload", "🔍 explore", "📊 visualize", "🧮 classify"]
+        "choose wisely", ["📤 upload", "🔍 informations", "📊 visualiser", "🧮 classifier"]
     )
 
-    if res == "📥 upload":
+    if res == "📤 upload":
         upload()
-    if res == "🔍 explore":
+    if res == "🔍 informations":
         infos()
-    if res == "📊 visualize":
+    if res == "📊 visualiser":
         visualize()
-    if res == "🧮 classify":
+    if res == "🧮 classifier":
         classify()
 
 
