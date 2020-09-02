@@ -10,9 +10,9 @@ def visualize():
         return
 
     st.header("📊 visualisation des données")
-    chart = st.selectbox("chart", ["bar", "line"])
+    chart = st.selectbox("diagramme :", ["bar chart", "line chart"])
 
-    if chart == "bar":
+    if chart == "bar chart":
         st.bar_chart(data.df.groupby([data.df.columns[-1]]).size())
-    elif chart == "line":
+    elif chart == "line chart":
         st.line_chart(data.df.groupby([data.df.columns[-1]]).size())

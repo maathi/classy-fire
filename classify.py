@@ -3,6 +3,7 @@ from data import Data
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 
 
@@ -34,6 +35,8 @@ class Classifier:
             model = RandomForestClassifier(
                 n_estimators=50, max_depth=100, random_state=15
             ).fit(self.x_train, self.y_train)
+        elif self.algo == "tree":
+            model = DecisionTreeClassifier().fit(self.x_train, self.y_train)
 
         self.model = model
 
@@ -54,7 +57,7 @@ def classify():
     st.header("🧮 classification des données :")
     algo = st.selectbox(
         "sélectionnez l'algorithme de classification :",
-        ["__", "Random Forest", "Logistic Regression"],
+        ["__", "Random Forest", "Logistic Regression", "Decision Tree"],
     )
 
     if algo != "__":

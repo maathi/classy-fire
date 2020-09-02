@@ -8,7 +8,8 @@ def infos():
     if not data.loaded:
         st.error("vous devez charger des données d'abord!")
         return
-
+    st.write(data.df.info())
+    st.write(data.df.describe())
     st.header("🔍 informations sur `%s` :" % data.filename)
     st.write("Nombre de lignes :  `%d`" % data.df.shape[0])
     st.write("Nombre de colonnes :  `%d`" % data.df.shape[1])

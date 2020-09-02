@@ -11,7 +11,7 @@ import classify
 def run():
 
     res = st.sidebar.selectbox(
-        "choose wisely", ["📤 upload", "🔍 informations", "📊 visualiser", "🧮 classifier"]
+        "", ["📤 upload", "🔍 informations", "📊 visualiser", "🧮 classifier"]
     )
 
     if res == "📤 upload":
