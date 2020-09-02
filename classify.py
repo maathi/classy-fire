@@ -35,7 +35,7 @@ class Classifier:
             model = RandomForestClassifier(
                 n_estimators=50, max_depth=100, random_state=15
             ).fit(self.x_train, self.y_train)
-        elif self.algo == "tree":
+        elif self.algo == "Decision Tree":
             model = DecisionTreeClassifier().fit(self.x_train, self.y_train)
 
         self.model = model
