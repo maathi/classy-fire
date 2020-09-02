@@ -10,5 +10,5 @@ class Data:
 
     def init(self, filename):
         self.filename = filename
-        self.df = pd.read_csv("/home/mehdi/pfe/app/data/" + filename)
+        self.df = pd.read_csv("data/" + filename)
         self.loaded = True
