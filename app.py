@@ -6,12 +6,12 @@ import upload
 import infos
 import visualize
 import classify
-
+import selection
 
 def run():
 
     res = st.sidebar.selectbox(
-        "", ["📤 upload", "🔍 informations", "📊 visualiser", "🧮 classifier"]
+        "", ["📤 upload", "🔍 informations", "📊 visualiser","selection", "🧮 classifier"]
     )
 
     if res == "📤 upload":
@@ -22,6 +22,8 @@ def run():
         visualize.visualize()
     if res == "🧮 classifier":
         classify.classify()
+    if res == "selection":
+        selection.select()
 
 
 run()
