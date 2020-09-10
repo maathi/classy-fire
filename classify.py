@@ -12,12 +12,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn import svm
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_predict
 
 
 class Classifier:
     df = None
-    size = None
-    folds = None
     algo = None
     model = None
 
@@ -42,6 +41,23 @@ class Classifier:
 
         self.model = model
 
+    def report(self, y_test, y_pred):
+        #replace this with heatmap thing
+        st.subheader("matrice de confusion :")
+        cm = confusion_matrix(y_test, y_pred)
+        st.write(cm)
+        
+        aa = accuracy_score(y_test, y_pred)
+        pp = precision_score(y_test, y_pred)
+        rr = recall_score(y_test, y_pred)
+        
+        st.subheader("Taux de succès : `%0.2f`" % aa)
+        st.subheader("Précision : `%0.2f`" % pp)
+        st.subheader("Rappel :`%0.2f`" % rr)
+
+        st.balloons()
+
+
 class Classifier_t(Classifier):
     pass
 
@@ -56,33 +72,20 @@ class Classifier_t(Classifier):
 
     def evaluate(self):
         preds = self.model.predict(self.x_test)
-        #replace this with heatmap thing
-        st.subheader("matrice de confusion :")
-        cm = confusion_matrix(self.y_test, preds)
-        st.write(cm)
-        
-        aa = accuracy_score(self.y_test, preds)
-        pp = precision_score(self.y_test, preds)
-        rr = recall_score(self.y_test, preds)
-        
-        st.subheader("Taux de succès : `%0.2f`" % aa)
-        st.subheader("Précision : `%d`" % (pp * 100))
-        st.subheader("Rappel :`%d`" % (rr * 100))
-        # cr = classification_report(self.y_test, preds)
-        
-        # st.write(cr)
-        st.balloons()
+        self.report(self.y_test, preds)
+ 
+
 
 
 class Classifier_c(Classifier):
     pass
 
     def train(self, folds):    
-        self.scores = cross_val_score(self.model, self.X, self.Y, cv=4)
-    
+        # self.scores = cross_val_score(self.model, self.X, self.Y, cv=folds)
+        self.y_pred = cross_val_predict(self.model, self.X, self.Y, cv=folds)
+        
     def evaluate(self):
-        st.write("Accuracy: %0.2f (+/- %0.2f)" % (self.scores.mean(), self.scores.std() * 2))
-
+        self.report(self.Y, self.y_pred)
 
 
 def classify():
