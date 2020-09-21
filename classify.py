@@ -14,6 +14,9 @@ from sklearn import svm
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 import time
+import seaborn as sns
+
+
 
 class Classifier:
     df = None
@@ -30,6 +33,7 @@ class Classifier:
     def setModel(self):
         if self.algo == "Logistic Regression":
             model = LogisticRegression()
+            
         elif self.algo == "Random Forest":
                 model = RandomForestClassifier(
                     n_estimators=50, max_depth=100, random_state=15
@@ -42,20 +46,30 @@ class Classifier:
         self.model = model
 
     def report(self, y_test, y_pred, d):
-        #replace this with heatmap thing
         st.subheader("Rapport de classification :")
         st.write("matrice de confusion :")
         cm = confusion_matrix(y_test, y_pred)
-        st.write(cm)
+        st.table(cm)
         
-        aa = accuracy_score(y_test, y_pred)
-        pp = precision_score(y_test, y_pred)
-        rr = recall_score(y_test, y_pred)
+        sns.heatmap(cm, annot=True)
+        st.pyplot()
+        #here goes the 
+        #hitmap 
+        #thing
         
+        aa = accuracy_score(y_test, y_pred) * 100
+        pp = precision_score(y_test, y_pred) * 100
+        rr = recall_score(y_test, y_pred) * 100
+        
+        # values = [[aa],[pp], [rr], [d]] 
+        # ix = ['Taux de succès','Précision', 'Rappel', 'time taken to build model' ]
+        # tab = pd.DataFrame(values,index=ix, columns=['']) 
+        # st.table(tab)
+
         st.write("Taux de succès : `%0.2f`" % aa)
         st.write("Précision : `%0.2f`" % pp)
         st.write("Rappel :`%0.2f`" % rr)
-        st.write("time taken to build model : `%0.2f`s" % d)
+        st.write("TEE : `%0.2f`s" % d)
 
         st.balloons()
 
@@ -65,7 +79,7 @@ class Classifier_t(Classifier):
 
     def split(self, size):
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
-            self.X, self.Y, test_size=size, random_state=15, shuffle=False
+            self.X, self.Y, test_size= 1-size, random_state=15, shuffle=False
         )
 
     def train(self):
@@ -100,7 +114,7 @@ def classify():
         st.error("vous devez charger des données d'abord!")
         return
 
-    st.header("🧮 classification des données :")
+    st.header("🧮 Classification des données :")
 
     test = st.selectbox(
         "sélectionnez la Méthode de test :",
@@ -108,9 +122,9 @@ def classify():
     )
 
     if test == "Percentage split":
-        size = st.slider("selection",0.0,1.0,0.25,0.05)
+        size = st.slider("pourcentage des données d'entrainement :",0.0,1.0,0.75,0.05)
     elif test == "Cross-validation":
-        folds = st.slider("plis :", 3, 20, 10, 1)
+        folds = st.slider("nombre de plis :", 3, 20, 10, 1)
 
     algo = st.selectbox(
         "sélectionnez l'algorithme de classification :",
@@ -119,7 +133,7 @@ def classify():
 
     
     if algo != "__" and test != "__":
-        with st.spinner("classification en cours..."):
+        with st.spinner("⏳ classification en cours..."):
             if test == "Percentage split":
                 clf = Classifier_t(data, algo)
                 clf.split(size)

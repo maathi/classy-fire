@@ -7,23 +7,27 @@ import infos
 import visualize
 import classify
 import selection
+import clustering
 
 def run():
 
     res = st.sidebar.selectbox(
-        "", ["📤 upload", "🔍 informations", "📊 visualiser","selection", "🧮 classifier"]
+        "", ["📤 Upload", "🔍 Informations", "📊 Visualisation","🎚 Sélection","🧿 Clustering", "🧮 Classification"]
     )
 
-    if res == "📤 upload":
+    if res == "📤 Upload":
         upload.upload()
-    if res == "🔍 informations":
+    if res == "🔍 Informations":
         infos.infos()
-    if res == "📊 visualiser":
+    if res == "📊 Visualisation":
         visualize.visualize()
-    if res == "🧮 classifier":
-        classify.classify()
-    if res == "selection":
+    if res == "🎚 Sélection":
         selection.select()
+    if res == "🧿 Clustering":
+        clustering.cluster()
+    if res == "🧮 Classification":
+        classify.classify()
+
 
 
 run()
