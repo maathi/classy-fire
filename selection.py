@@ -20,6 +20,7 @@ def select():
         # Find index of feature columns with correlation greater than 0.9
         to_drop = [column for column in upper.columns if any(upper[column] > min_corr)]
  
+        st.subheader("Résultat de la sélection :")
         st.write("le nombre d'attributs supprimés : `%d`" % len(to_drop))
         st.write("la liste des attributs supprimés :")
         st.write(to_drop)

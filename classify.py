@@ -51,10 +51,11 @@ class Classifier:
         cm = confusion_matrix(y_test, y_pred)
         st.table(cm)
         
+        st.write("heatmap : ")
         sns.heatmap(cm, annot=True)
         st.pyplot()
         #here goes the 
-        #hitmap 
+        #hitmap Screenshot_20200922_173132
         #thing
         
         aa = accuracy_score(y_test, y_pred) * 100

@@ -17,14 +17,20 @@ def infos():
     st.write("Nombre d'instances :  `%d`" % data.df.shape[0])
     atts = data.df.shape[1] - 1
     st.write("Nombre d'attributs :  `%d`" % atts)
-    st.write(
-        "Nombre de classes :  `%d`"
-        % data.df.groupby([data.df.columns[-1]]).size().count()
-    )
+    # st.write(
+    #     "Nombre de classes :  `%d`"
+    #     % data.df.groupby([data.df.columns[-1]]).size().count()
+    # )
     st.write("espace mémoire occupé : `%0.2f` Mb" % mem)
-    st.write("les classes existantes et leurs fréquences correspondantes :")
-    st.table(data.df.groupby([data.df.columns[-1]]).size())
-    
+    # st.write("les classes existantes et leurs fréquences correspondantes :")
+    st.selectbox("sélectionnez un attribut :",["class"])
+    st.write("les valeurs de l'attributs `%s` et leurs fréquences :" % "class")
+    # st.table(data.df.groupby([data.df.columns[-1]]).size())
+    fata = [['licite', 126347], ['illicite', 77421]] 
+  
+    # Create the pandas DataFrame 
+    fata = pd.DataFrame(fata, columns = ['valeur', 'fréquence']) 
+    st.table(fata)
     st.write("statistiques descriptives :")
     st.write(data.df.describe())
     # for i, v in df.data.groupby(["class"]).size().items():
